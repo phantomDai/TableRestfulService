@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>task</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+</head>
+<body>
+
+	
+
+	<div class="container">
+		<div class="row my-2 justify-content-between">
+			<div class="col my-2">
+				<div class="input-group">
+					<span class="input-group-btn">
+						<button class="btn btn-outline-danger" data-toggle="modal" data-target="#createtable" type="button" name="_delete" onclick="handler[this.name]()">create table</button>
+					</span>
+					<input id="tablename" type="text" name="_getname" class="form-control col" placeholder="table name" oninput="changeTableName(this.value)">	
+					<span class="input-group-btn">
+						<button class="btn btn-outline-primary" name="showScheme" type="button" onclick="handler['_show'](this.name)">get table</button>
+					</span>
+				</div>				
+			</div>
+			<!-- <div class="col-md-6 my-2">
+				<div class="btn-group">
+					<button class="btn btn-outline-success" type="button">insert table</button>
+					<button class="btn btn-outline-primary" type="button">insert row</button>
+					<button class="btn btn-outline-danger" type="button">delete rows</button>
+				</div>
+			</div> -->
+		</div>
+
+		<div class="row justify-content-center">
+			<div class="col-md-12 " id="tables"></div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="createtable">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">create table</h5>
+					<button type="button" class="close" data-dismiss="modal">
+						<span>&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form action="">
+						<div class="form-group">
+							<label for="tablename">Table Name:</label>
+							<input id="tablename" type="text" class="form-control" name="_tablename">
+						</div>
+						<div class="form-group">
+							<label for="tableid">Table Id:</label>
+							<input id="tableid" type="text" class="form-control" name="_tableid">
+						</div>
+						<button type="submit" class="btn btn-success">Submit</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+		
+
+
+	<!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		"use strict";
+		
+		const COLORS = ['active','warning','info','danger','success'];	
+		var tablename = null;
+		var select_tables = [];
+		var select_rows = [];
+
+
+		var changeTableName = 	function (value) {
+								tablename = value;
+								console.log(tablename);
+							};
+
+		var showScheme = 	function (scheme) { /* show tables */
+								var tables = $("table",scheme);//scheme.querySelectorAll("table");
+
+								var str = "<div class='list-group'>";
+								for(var i = 0; i < 10; ++i) {
+									var id = $(tables[i]).attr("id");
+									var name = $(tables[i]).attr("name");
+									str += "<li class='list-group-item list-group-item-action'>";
+									str += ("<a class='col' data-toggle='collapse' onclick='table_handler(this)' href='#table_" + id + "' name='" + id + "'>" + name + "</a><a href='#' onclick=" + "'handler[" + '"_delete"' + "](" + id + ")' class='col-2 col-md-1 d-none'>delete</a><a href='#' class='col-2 col-md-1 d-none'>insert</a></li>");
+									str += "<div class='collapse' id=table_" + id + ">" + showTable(tables[i]);
+									str += "</div>";
+								};
+								str += "</div>";
+								$("#tables").html(str);
+							};
+
+		var table_handler = function (self) {
+								select_tables[self.name]||(select_tables[self.name] = []);
+								$(self).nextAll().toggleClass("d-none");
+							};
+
+		var row_handler = 	function (self,tablename,rowname) {
+								var value = select_tables[tablename][rowname];
+									console.log(value);
+								select_tables[tablename][rowname] = value?undefined:rowname;
+								$("th",self).toggleClass("bg-inverse text-white");
+							};
+
+		var showTable = 	function (table) {	/* select * from tablename */
+								var table_name = $(table).attr("id");
+								var rows = $("row",table);
+									//console.log(rows);
+								var column = $("column",rows[0]);
+									
+								var str = "<table class='table table-sm table-bordered table-striped mb-0 table-hover'><thead class='thead-inverse'><tr>";
+									str += "<th>#</th>";
+									for(var i = 0; i < column.length; ++i){
+										str += "<th>col-" + $(column[i]).attr('id') + "</th>";
+									};
+									str += "</tr></thead><tbody>";
+									for(var i = 0,k = 0; i < rows.length; ++i) {
+										var row_name = $(rows[i]).attr('id');
+										str += "<tr class=table-" + COLORS[i%COLORS.length]  + " id='" + table_name + "_" + row_name + "'" + "onclick='row_handler(this," + table_name + "," + row_name + ")'>";
+										column = $("column",rows[i]);
+										str += "<th scope='row'>" + (++k) + "</th>";
+										for(var j = 0; j < column.length; ++j) {
+											str += "<td>" + $(column[j]).text() + "</td>"
+										}
+										str += "</tr>";
+									}
+									str += "</tbody></table>";
+									//console.log(str);
+									return str;
+							};
+
+		var handler = 	{
+				_show 	: 	function (name) {
+								$.ajax({ url:"scheme.xml",method:"GET",dataType:"xml",async:true,success:window[name] });
+							},
+
+				_create : 	function () {
+
+							},
+
+				_insert : 	function () {
+
+							},
+
+				_delete : 	function (name) {
+								var flag = true;
+								if(select_tables[name]) {
+									for(var i in select_tables[name]) {
+										if(select_tables[name][i]){
+											console.log($("#"+name+"_"+select_tables[name][i]));//.remove();
+											$("#"+name+"_"+select_tables[name][i]).remove();
+											select_tables[name][i] = undefined;
+											flag = false;
+										}
+									}
+									if(flag){
+										/* delete table */
+										$("#table_"+name).prev().remove();
+										$("#table_"+name).remove();
+										select_tables[name] = null;
+									}
+									console.log(flag);
+								}
+							}
+		};
+	</script>
+</body>
+</html>
